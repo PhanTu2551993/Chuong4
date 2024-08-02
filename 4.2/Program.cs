@@ -14,23 +14,39 @@
 
         static int CalculateElectricityBill(int totalKW)
         {
-            int cost = 0;
 
-            if (totalKW <= 100)
+
+            // Mảng lưu trữ các mức giá
+            int[] prices = { 500, 550, 600, 650 };
+
+            // Mảng lưu trữ các giới hạn tiêu thụ
+            int[] limits = { 100, 150, 200};
+
+            int cost = 0;
+            int remainingKW = totalKW;
+
+            for (int i = 0; i < limits.Length; i++)
             {
-                cost = totalKW * 500;
+                if (remainingKW <= 0)
+                    break;
+
+                int kwAtCurrentRate = (i == 0) ? limits[i] : limits[i] - limits[i - 1];
+                if (remainingKW <= kwAtCurrentRate)
+                {
+                    cost += remainingKW * prices[i];
+                    remainingKW = 0;
+                }
+                else
+                {
+                    cost += kwAtCurrentRate * prices[i];
+                    remainingKW -= kwAtCurrentRate;
+                }
             }
-            else if (totalKW <= 150)
+
+
+            if (remainingKW > 0)
             {
-                cost = 100 * 500 + (totalKW - 100) * 550;
-            }
-            else if (totalKW <= 200)
-            {
-                cost = 100 * 500 + 50 * 550 + (totalKW - 150) * 600;
-            }
-            else
-            {
-                cost = 100 * 500 + 50 * 550 + 50 * 600 + (totalKW - 200) * 650;
+                cost += remainingKW * prices[prices.Length - 1];
             }
 
             return cost;
